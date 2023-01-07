@@ -15,33 +15,33 @@ public class Program
         /* Language Integrated Querry -- LINQ */
 
         /* Insert Operation Methods*/
-        //var league = new League { Name = "Premiere League" };
-        //await leagueDbContext.Leagues.AddAsync(league);
-        //await leagueDbContext.SaveChangesAsync();
-        //await AddTeamsWithLeague(league);
+        var league = new League { Name = "Premiere League" };
+        await context.Leagues.AddAsync(league);
+        await context.SaveChangesAsync();
+        await AddTeamsWithLeague(league);
 
         /* Add single object to the DB */
-        //await leagueDbContext.SaveChangesAsync();
+        await context.SaveChangesAsync();
 
         /* Select Queries */
-        //SelectQuery();
+        SelectQuery();
 
         /* Queries w/ Filters */
-        //await QueryFilters();
+        await QueryFilters();
 
         /* Aggregate Functions */
-        //await AdditionalExecuteMethods();
+        await AdditionalExecuteMethods();
 
         /* LINQ without Lambda Expression*/
-        //await AlterLinqSyntax();
+        await AlterLinqSyntax();
 
         /* Working w/ Records */
-        //await UpdateLeague();
-        //await UpdateTeam();
+        await UpdateLeague();
+        await UpdateTeam();
 
         /*Perform Delete*/
-        //await DeleteLeague();
-        //await DeleteRelationship();
+        await DeleteLeague();
+        await DeleteRelationship();
 
         /* Tracking vs No-Tracking*/
         await Tracking();
@@ -65,7 +65,6 @@ public class Program
 
         var afterSave = context.ChangeTracker.Entries();
     }
-
     private static async Task DeleteLeague()
     {
         var league = await context.Leagues.FindAsync(3);
