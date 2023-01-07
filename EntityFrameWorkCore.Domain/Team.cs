@@ -1,9 +1,15 @@
-﻿namespace EntityFrameWorkCore.Domain;
+﻿using EntityFrameWorkCore.Domain.Common;
 
-public class Team
+namespace EntityFrameWorkCore.Domain;
+
+public class Team : BaseDataDomain // Inheritance from the BaseDataDomain.cs
 {
-    public int Id { get; set; }
-    public string Name { get; set; }
+    /* Foreign Key related to Leaugue */
     public int LeagueId { get; set; }
     public virtual League League { get; set; }
+    public virtual Coach Coach { get; set; }
+
+    /* Navigation Properties */
+    public virtual List<Match> HomeMatches { get; set; }
+    public virtual List<Match> AwayMatches { get; set; }
 }

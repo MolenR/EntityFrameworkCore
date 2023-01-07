@@ -15,41 +15,109 @@ public class Program
         /* Language Integrated Querry -- LINQ */
 
         /* Insert Operation Methods*/
-        var league = new League { Name = "Premiere League" };
-        await context.Leagues.AddAsync(league);
-        await context.SaveChangesAsync();
-        await AddTeamsWithLeague(league);
+
+        //var league = new League { Name = "Premiere League" };
+        //await context.Leagues.AddAsync(league);
+        //await context.SaveChangesAsync();
+        //await AddTeamsWithLeague(league);
 
         /* Add single object to the DB */
-        await context.SaveChangesAsync();
+        //await context.SaveChangesAsync();
 
         /* Select Queries */
-        SelectQuery();
+        //SelectQuery();
 
         /* Queries w/ Filters */
-        await QueryFilters();
+        //await QueryFilters();
 
         /* Aggregate Functions */
-        await AdditionalExecuteMethods();
+        //await AdditionalExecuteMethods();
 
         /* LINQ without Lambda Expression*/
-        await AlterLinqSyntax();
+        //await AlterLinqSyntax();
 
         /* Working w/ Records */
-        await UpdateLeague();
-        await UpdateTeam();
+        //await UpdateLeague();
+        //await UpdateTeam();
 
         /*Perform Delete*/
-        await DeleteLeague();
-        await DeleteRelationship();
+        //await DeleteLeague();
+        //await DeleteRelationship();
 
         /* Tracking vs No-Tracking*/
-        await Tracking();
+        //await Tracking();
+
+        /* Adding 1 - N Related Records */
+        //await AddNewLeague();
+
+        /* Adding N - M Related Records */
+        //await AddNewMatch();
+
+        /* Including Related Data - Eager Loading*/
+        //await QueryRelatedRecords();
 
         Console.WriteLine($"Press Key");
         Console.ReadKey();
     }
 
+    private static async Task QueryRelatedRecords()
+    {
+        // Get Many Related Records - Leagues -> Teams
+        var leagues = await context.Leagues
+            .Include(league => league.Teams)
+            .ToListAsync(); 
+        //SELECT    [l].[Id], [l].[Name], [t].[Id], [t].[LeagueId], [t].[Name]
+        //FROM      [Leagues] AS[l]
+        //LEFT JOIN [Teams] AS[t] ON[l].[Id] = [t].[LeagueId]
+        //ORDER BY  [l].[Id]
+
+        // Get One Related Record - Team -> Coach
+        
+        /*NO WORKING COACH TABLE*/
+        var team = await context.Teams
+            .Include(team => team.Coach)
+            .FirstOrDefaultAsync(team => team.Id == 1);
+
+        // Get 'Childeren' Related Records - Team -> Matches Home/Away Team
+        
+        /* NO WORKING MATCHES TABLE */
+        var teamsWithMatch = await context.Teams
+            // Includes
+            .Include(team => team.AwayMatches)
+                .ThenInclude(team => team.HomeTeam)
+                .ThenInclude(team => team.Coach)
+            .Include(team => team.HomeMatches)
+                .ThenInclude(team => team.AwayTeam)
+                .ThenInclude(team => team.Coach)
+            // Executes
+            .FirstOrDefaultAsync(team => team.Id == 1);
+    }
+    private static async Task AddNewLeague()
+    {
+        var teams = new List<Team>
+        {
+            new Team
+            {
+                Name = "Real Madrid",
+                
+            }
+        };
+        var league = new League { Name = "La Liga", Teams = teams };
+        await context.AddAsync(league);
+        await context.SaveChangesAsync();
+    }
+    private static async Task AddNewMatch()
+    {
+        var matches = new List<Match>
+        {
+            new Match
+            {
+                AwayTeamId = 5, HomeTeamId = 6, Date = new DateTime()
+            }
+        };
+        await context.AddRangeAsync(matches);
+        await context.SaveChangesAsync();
+    }
     private static async Task Tracking()
     {
         var withTracking = await context.Teams.FirstOrDefaultAsync(team => team.Id == 5);
