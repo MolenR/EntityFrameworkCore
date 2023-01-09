@@ -1,10 +1,13 @@
-﻿using EntityFrameWorkCore.Domain;
+﻿using EntityFrameWorkCore.Data.Configurations.Entities;
+using EntityFrameWorkCore.Domain;
+using EntityFrameWorkCore.Domain.Common;
+using EntityFrameWorkCore.Domain.Views;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace EntityFrameWorkCore.Data;
 
-public class LeagueDbContext : DbContext
+public class LeagueDbContext : AuditLeagueDbContext
 {
     // String builder to locate the SQLDB
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -32,10 +35,20 @@ public class LeagueDbContext : DbContext
             .HasForeignKey(team => team.AwayTeamId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
+
+        // Let the DB know that this is a VIEW TABLE
+        // New Model directs to the model inside the DB mapped as this VIEW and has NO Primary Key. No Tracking
+        modelBuilder.Entity<TeamCoachLeagueView>().HasNoKey().ToView("TeamCoachLeague");
+
+        //Call the SeedConfig.cs
+        modelBuilder.ApplyConfiguration(new LeagueSeedConfig());
+        modelBuilder.ApplyConfiguration(new TeamSeedConfig());
+        modelBuilder.ApplyConfiguration(new CoachSeedConfig());
     }
 
     public DbSet<Team> Teams { get; set; }
     public DbSet<League> Leagues { get; set; }
     public DbSet<Match> Matches { get; set; }
     public DbSet<Coach> Coaches { get; set; }
+    public DbSet<TeamCoachLeagueView> TeamCoachLeague { get; set; }
 }
